@@ -10,18 +10,18 @@ class TinyVGG(nn.Module):
             #             BLOCK 1             #
             #=================================#
             nn.Conv2d(in_channels=input_shape,
-                      out_channels=64,
+                      out_channels=32,
                       kernel_size=3,
                       stride=1,
                       padding=1),
             nn.ReLU(),
-            nn.Conv2d(in_channels=64,
+            nn.Conv2d(in_channels=32,
                       out_channels=64,
                       kernel_size=3,
                       stride=1,
                       padding=1),
-            nn.ReLU(),
             nn.BatchNorm2d(64),
+            nn.ReLU(),
             #=================================#
             #           Max Pool 1            #
             #=================================#
@@ -40,8 +40,8 @@ class TinyVGG(nn.Module):
                       kernel_size=3,
                       stride=1,
                       padding=1),
-            nn.ReLU(),
             nn.BatchNorm2d(128),
+            nn.ReLU(),
             #=================================#
             #           Max Pool 2            #
             #=================================#
@@ -60,8 +60,8 @@ class TinyVGG(nn.Module):
                       kernel_size=3,
                       stride=1,
                       padding=1),
-            nn.ReLU(),
             nn.BatchNorm2d(256),
+            nn.ReLU(),
             #=================================#
             #           Max Pool 3            #
             #=================================#
@@ -86,8 +86,8 @@ class TinyVGG(nn.Module):
                       kernel_size=3,
                       stride=1,
                       padding=1),
-            nn.ReLU(),
             nn.BatchNorm2d(512),
+            nn.ReLU(),
             #=================================#
             #           Max Pool 4            #
             #=================================#
@@ -95,9 +95,13 @@ class TinyVGG(nn.Module):
         )
         self.fcs = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=2048, out_features=2048),
-            nn.Linear(in_features=2048, out_features=2048),
-            nn.Linear(in_features=2048, out_features=num_classes)
+            nn.Linear(in_features=2048, out_features=1024),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=1024, out_features=512),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=512, out_features=num_classes)
         )
 
     def forward(self, x: torch.tensor) -> torch.tensor:

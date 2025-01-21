@@ -37,6 +37,7 @@ def main():
     )
 
     class_names = train_data.classes
+    print(class_names)
 
     train_dataloader = DataLoader(dataset=train_data,
                                   batch_size=BATCH_SIZE,
@@ -53,7 +54,7 @@ def main():
     optimizer = torch.optim.Adam(params=tiny_vgg_model.parameters(), lr=1e-3, weight_decay=1e-4)
 
     if os.path.exists(model_save_path):
-        tiny_vgg_model.load_state_dict(torch.load(model_save_path, weights_only=True))
+        tiny_vgg_model.load_state_dict(torch.load(model_save_path))
     else:
         model_results = train_model(model=tiny_vgg_model,
                                     train_dataloader=train_dataloader,

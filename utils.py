@@ -1,5 +1,10 @@
+import os
 import torch
 from tqdm.auto import tqdm
+from typing import List
+
+from PIL import Image
+from torchvision.transforms import transforms
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -71,6 +76,10 @@ def train_model(model: torch.nn.Module,
                 device: torch.device = device):
     best_test_loss = float("inf")
     model_path = "/".join(["./saved_models", model.__class__.__name__ + ".pth"])
+
+    if not os.path.exists(os.path.dirname(model_path)):
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+
     results = {
         "train_loss": [],
         "train_acc": [],
@@ -128,3 +137,23 @@ def make_predictions(model: torch.nn.Module,
 
     # Stack the pred_probs to turn list into tensor
     return torch.stack(pred_probs)
+
+
+def predict_image(model: torch.nn.Module,
+                  image_path: str,
+                  classes: List[str],
+                  device: torch.device = device):
+    transform = transforms.Compose([
+        transforms.Resize((32, 32)),
+        transforms.ToTensor(),
+        transforms.Normalize(0.5, 0.5)
+    ])
+    img = Image.open(image_path).convert("RGB")
+    input_tensor = transform(img).unsqueeze(0).to(device)
+    output = model(input_tensor)
+    probs = torch.nn.functional.softmax(output, dim=1)
+    max_prob, predicted_idx = torch.max(probs, dim=1)
+    max_prob = max_prob.item()
+    predicted_class = classes[predicted_idx.item()]
+
+    print(f"Uploaded image belongs to class: {predicted_class} with probability p = {max_prob:.2f}")
