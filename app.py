@@ -10,7 +10,7 @@ classes = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'hors
 
 # Loading the model
 model = TinyVGG(input_shape=3, num_classes=10)
-model.load_state_dict(torch.load("./saved_models/TinyVGG.pth"))
+model.load_state_dict(torch.load("./saved_models/TinyVGG.pth", map_location=torch.device("cpu")))
 
 # Setting the model in evaluation mode
 model.eval()
@@ -32,7 +32,7 @@ uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg
 if uploaded_file:
     # Display the uploaded image
     image = Image.open(uploaded_file).convert('RGB')
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    st.image(image, caption="Uploaded Image", use_container_width=True)
 
     # Predict the class
     with st.spinner("Classifying..."):
